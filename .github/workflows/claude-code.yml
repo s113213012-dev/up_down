@@ -1,0 +1,37 @@
+name: Claude Code Agent
+
+# 設定觸發時機：當有人在 Issue/PR 留言，或是提交新的 PR 時
+on:
+  issue_comment:
+    types: [created]
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  claude_action:
+    # 確保只有在 PR 或是有提到 @claude 的留言時才執行，避免浪費 Action 額度
+    if: |
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
+    
+    runs-on: ubuntu-latest
+
+    # 這裡直接宣告權限，確保它對儲存庫內容和 PR 有讀寫權限
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+
+    steps:
+      # 1. 複製（Checkout）你的專案程式碼到執行環境
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. 執行你剛才複製的 Claude Code 核心
+      - name: Claude Code Action Official
+        uses: anthropics/claude-code-action@v1
+        env:
+          # 引入你剛才在 Settings 設定的 Anthropic 金鑰
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # GitHub 自動提供的內建 Token，用來讓 Claude 可以在 GitHub 上留言
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
