@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#2D5A1B" />
+  <title>山上山下 Up & Down</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700&family=Lato:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --c-primary:      #2D5A1B;
+      --c-primary-dk:   #1D3D11;
+      --c-primary-lt:   #4A8A2C;
+      --c-accent:       #8B5E2A;
+      --c-accent-lt:    #C4864A;
+      --c-bg:           #F7F4EE;
+      --c-bg-card:      #FFFFFF;
+      --c-bg-header:    #2D5A1B;
+      --c-text:         #2B2416;
+      --c-text-sub:     #6B5C48;
+      --c-text-inv:     #FFFFFF;
+      --c-divider:      #E0D8CC;
+      --c-overlay:      rgba(0,0,0,0.55);
+
+      --tag-veg:        #3A7D44;
+      --tag-veg-bg:     #E6F4EA;
+      --tag-v5:         #8B5E2A;
+      --tag-v5-bg:      #FBF0E3;
+      --tag-spicy:      #C0392B;
+      --tag-spicy-bg:   #FDECEA;
+      --tag-new:        #1565C0;
+      --tag-new-bg:     #E3F0FD;
+      --tag-rec:        #E67E22;
+      --tag-rec-bg:     #FEF3E7;
+      --tag-gf:         #6A1B9A;
+      --tag-gf-bg:      #F5E6FB;
+      --tag-hot:        #B71C1C;
+      --tag-hot-bg:     #FDECEA;
+
+      --r-card:    12px;
+      --r-badge:   20px;
+      --r-modal:   20px;
+
+      --shadow-card:  0 2px 12px rgba(0,0,0,0.08);
+      --shadow-modal: 0 8px 40px rgba(0,0,0,0.22);
+
+      --font-zh: 'Noto Serif TC', serif;
+      --font-ui: 'Noto Sans TC', 'Lato', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-ui);
+      background: var(--c-bg);
+      color: var(--c-text);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    body.modal-open { overflow: hidden; }
+
+    img { display: block; max-width: 100%; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+    /* ── Header ── */
+    .header {
+      background: var(--c-bg-header);
+      color: var(--c-text-inv);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .header-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .brand-zh {
+      font-family: var(--font-zh);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      line-height: 1.2;
+    }
+    .brand-en {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      opacity: 0.8;
+      font-weight: 400;
+    }
+    .header-mountain {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .mountain-svg {
+      opacity: 0.35;
+      width: 80px;
+      height: 36px;
+    }
+    .lang-switcher {
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .lang-btn {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+      border-radius: 16px;
+      color: rgba(255,255,255,0.75);
+      transition: all 0.2s;
+    }
+    .lang-btn.active {
+      background: #fff;
+      color: var(--c-primary);
+    }
+
+    /* ── Category Nav ── */
+    .cat-nav-wrap {
+      background: var(--c-bg-card);
+      border-bottom: 1px solid var(--c-divider);
+      position: sticky;
+      top: 63px;
+      z-index: 90;
+    }
+    .cat-nav {
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 0 12px;
+      max-width: 480px;
+      margin: 0 auto;
+      scrollbar-width: none;
+    }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      flex-shrink: 0;
+      scroll-snap-align: start;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--c-text-sub);
+      white-space: nowrap;
+      border-bottom: 2.5px solid transparent;
+      transition: all 0.2s;
+      font-family: var(--font-ui);
+    }
+    .cat-btn.active {
+      color: var(--c-primary);
+      border-bottom-color: var(--c-primary);
+      font-weight: 700;
+    }
+
+    /* ── Main Content ── */
+    .main {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 0 40px;
+    }
+
+    /* ── Section ── */
+    .menu-section {
+      padding-top: 8px;
+    }
+    .section-header {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+      padding: 20px 16px 10px;
+    }
+    .section-title-zh {
+      font-family: var(--font-zh);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--c-primary-dk);
+      line-height: 1;
+    }
+    .section-title-en {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--c-text-sub);
+      text-transform: uppercase;
+      padding-bottom: 2px;
+    }
+    .section-divider {
+      height: 1px;
+      background: var(--c-divider);
+      margin: 0 16px 4px;
+    }
+
+    /* ── Card Grid ── */
+    .card-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--c-divider);
+    }
+
+    /* ── Menu Card ── */
+    .menu-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--c-bg-card);
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .menu-card:active { background: #F0EDE7; }
+
+    .card-img-wrap {
+      width: 76px;
+      height: 76px;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--c-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+    }
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-body { flex: 1; min-width: 0; }
+    .card-name-zh {
+      font-family: var(--font-zh);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--c-text);
+      line-height: 1.3;
+    }
+    .card-name-en {
+      font-size: 11px;
+      color: var(--c-text-sub);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-desc {
+      font-size: 12px;
+      color: var(--c-text-sub);
+      margin-top: 4px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .card-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+    .card-price {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--c-accent);
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    /* ── Tag Badge ── */
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: var(--r-badge);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .tag-veg  { color: var(--tag-veg);   background: var(--tag-veg-bg); }
+    .tag-v5   { color: var(--tag-v5);    background: var(--tag-v5-bg); }
+    .tag-spicy{ color: var(--tag-spicy); background: var(--tag-spicy-bg); }
+    .tag-new  { color: var(--tag-new);   background: var(--tag-new-bg); }
+    .tag-rec  { color: var(--tag-rec);   background: var(--tag-rec-bg); }
+    .tag-gf   { color: var(--tag-gf);    background: var(--tag-gf-bg); }
+    .tag-hot  { color: var(--tag-hot);   background: var(--tag-hot-bg); }
+
+    /* ── Modal Overlay ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--c-overlay);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ── Modal Sheet ── */
+    .modal-sheet {
+      background: var(--c-bg-card);
+      border-radius: var(--r-modal) var(--r-modal) 0 0;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      box-shadow: var(--shadow-modal);
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    }
+    .modal-overlay.open .modal-sheet {
+      transform: translateY(0);
+    }
+
+    .modal-drag-bar {
+      width: 36px;
+      height: 4px;
+      background: var(--c-divider);
+      border-radius: 2px;
+      margin: 10px auto 6px;
+    }
+
+    .modal-img-wrap {
+      width: 100%;
+      height: 240px;
+      background: var(--c-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 80px;
+      overflow: hidden;
+      position: relative;
+    }
+    .modal-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      touch-action: pinch-zoom;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .modal-body {
+      padding: 16px 20px 32px;
+    }
+    .modal-name-zh {
+      font-family: var(--font-zh);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--c-text);
+      line-height: 1.3;
+    }
+    .modal-name-en {
+      font-size: 13px;
+      color: var(--c-text-sub);
+      margin-top: 3px;
+      letter-spacing: 0.03em;
+    }
+    .modal-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .modal-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--c-accent);
+      margin-top: 12px;
+    }
+    .modal-divider {
+      height: 1px;
+      background: var(--c-divider);
+      margin: 14px 0;
+    }
+    .modal-desc {
+      font-size: 14px;
+      color: var(--c-text-sub);
+      line-height: 1.7;
+    }
+    .modal-allergen-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--c-text-sub);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 16px;
+      margin-bottom: 4px;
+    }
+    .modal-allergen {
+      font-size: 12px;
+      color: var(--c-text-sub);
+    }
+
+    /* ── Footer ── */
+    .site-footer {
+      background: var(--c-primary-dk);
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      padding: 24px 16px;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+    .site-footer strong { color: #fff; font-family: var(--font-zh); }
+
+    /* ── Utility ── */
+    .visually-hidden {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════ -->
+<header class="header" role="banner">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="brand-zh" id="brand-zh">山上山下</span>
+      <span class="brand-en">UP &amp; DOWN</span>
+    </div>
+
+    <div class="header-mountain" aria-hidden="true">
+      <svg class="mountain-svg" viewBox="0 0 80 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 34 L24 8 L36 20 L44 10 L62 34Z" fill="white" opacity="0.7"/>
+        <path d="M28 34 L50 16 L62 26 L72 14 L80 34Z" fill="white" opacity="0.4"/>
+        <line x1="0" y1="34" x2="80" y2="34" stroke="white" stroke-width="1.5" opacity="0.4"/>
+      </svg>
+    </div>
+
+    <div class="lang-switcher" role="group" aria-label="語言切換 / Language">
+      <button class="lang-btn active" id="btn-zh" onclick="setLang('zh')" aria-pressed="true">中</button>
+      <button class="lang-btn" id="btn-en" onclick="setLang('en')" aria-pressed="false">EN</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════
+     CATEGORY NAV
+═══════════════════════════════════════════════ -->
+<nav class="cat-nav-wrap" aria-label="菜單分類">
+  <div class="cat-nav" id="cat-nav" role="tablist"></div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     MAIN
+═══════════════════════════════════════════════ -->
+<main class="main" id="main-content" aria-label="菜單內容"></main>
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer class="site-footer">
+  <strong id="footer-brand">山上山下 Up &amp; Down</strong><br/>
+  <span id="footer-addr">南投縣埔里鎮山嶺路 88 號</span><br/>
+  <span id="footer-hours">週三－週日　11:00 – 20:00</span><br/><br/>
+  <span id="footer-note">所有價格含稅・All prices inclusive of tax・NT$</span>
+</footer>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL
+═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-name">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-drag-bar" aria-hidden="true"></div>
+    <div class="modal-img-wrap" id="modal-img-wrap">
+      <button class="modal-close" id="modal-close-btn" aria-label="關閉">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-name-zh" id="modal-name"></div>
+      <div class="modal-name-en" id="modal-name-en"></div>
+      <div class="modal-tags" id="modal-tags"></div>
+      <div class="modal-price" id="modal-price"></div>
+      <div class="modal-divider"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-allergen-title" id="modal-allergen-title" style="display:none">過敏原 Allergen</div>
+      <div class="modal-allergen" id="modal-allergen"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════
+   DATA LAYER
+══════════════════════════════════════════════ */
+
+const TAGS = {
+  veg:   { cls: 'tag-veg',   zh: '🌿 素食',     en: '🌿 Veg' },
+  v5:    { cls: 'tag-v5',    zh: '🪷 五辛素',    en: '🪷 V5' },
+  spicy: { cls: 'tag-spicy', zh: '🌶 辣',        en: '🌶 Spicy' },
+  new:   { cls: 'tag-new',   zh: '✨ 新品',      en: '✨ New' },
+  rec:   { cls: 'tag-rec',   zh: '👍 推薦',      en: '👍 Chef\'s Pick' },
+  gf:    { cls: 'tag-gf',    zh: '🌾 無麩質',    en: '🌾 GF' },
+  hot:   { cls: 'tag-hot',   zh: '🔥 熱銷',      en: '🔥 Popular' },
+};
+
+const SITE_INFO = {
+  zh: { brand: '山上山下', addr: '南投縣埔里鎮山嶺路 88 號', hours: '週三－週日　11:00 – 20:00', note: '所有價格含稅' },
+  en: { brand: 'Up & Down', addr: '88 Shanling Rd, Puli, Nantou', hours: 'Wed – Sun　11:00 – 20:00', note: 'All prices inclusive of tax・NT$' },
+};
+
+const MENU = [
+  /* ─── 前菜 Starters ─── */
+  {
+    cat: { id: 'starter', zh: '前菜', en: 'Starters' },
+    items: [
+      {
+        id: 's1',
+        zh: '山林冷盤', en: 'Forest Cold Platter',
+        desc: { zh: '季節野菜、醃漬山菇、手工豆腐，以山林草本油醋點綴。', en: 'Seasonal greens, pickled shiitake, handmade tofu with forest herb vinaigrette.' },
+        price: 220,
+        emoji: '🥗',
+        tags: ['veg', 'rec'],
+        allergen: { zh: '大豆', en: 'Soy' },
+      },
+      {
+        id: 's2',
+        zh: '炭烤山藥佐味噌', en: 'Charcoal Yam & Miso',
+        desc: { zh: '南投在地山藥以備長炭慢烤，搭配自製白味噌醬，外酥內綿。', en: 'Local yam slow-roasted over binchotan charcoal, served with house white miso sauce.' },
+        price: 180,
+        emoji: '🍠',
+        tags: ['veg', 'gf'],
+        allergen: { zh: '大豆', en: 'Soy' },
+      },
+      {
+        id: 's3',
+        zh: '香蒜辣炒溪蝦', en: 'Garlic Chilli River Shrimp',
+        desc: { zh: '埔里溪流鮮蝦，以蒜片、辣椒大火快炒，酥脆鮮甜。', en: 'Fresh Puli river shrimp stir-fried with garlic slices and chilli. Crispy and sweet.' },
+        price: 260,
+        emoji: '🦐',
+        tags: ['spicy', 'hot'],
+        allergen: { zh: '甲殼類', en: 'Crustaceans' },
+      },
+      {
+        id: 's4',
+        zh: '手工山粉圓豆腐', en: 'Handmade Basil Seed Tofu',
+        desc: { zh: '以山粉圓（羅勒籽）製作的冰涼嫩豆腐，淋上醬油膏與薑汁。', en: 'Chilled basil seed tofu drizzled with sweet soy sauce and fresh ginger juice.' },
+        price: 160,
+        emoji: '🫙',
+        tags: ['veg', 'v5', 'new'],
+        allergen: { zh: '大豆', en: 'Soy' },
+      },
+    ],
+  },
+
+  /* ─── 主餐 Mains ─── */
+  {
+    cat: { id: 'main', zh: '主餐', en: 'Mains' },
+    items: [
+      {
+        id: 'm1',
+        zh: '山上雞腿定食', en: 'Mountain Chicken Leg Set',
+        desc: { zh: '放牧仿土雞腿，以香草醃製後炭烤，附白飯、味噌湯與當日小菜三樣。', en: 'Free-range chicken leg marinated in herbs, charcoal-grilled. Served with rice, miso soup, and three daily sides.' },
+        price: 380,
+        emoji: '🍗',
+        tags: ['rec', 'hot'],
+        allergen: { zh: '大豆、小麥', en: 'Soy, Wheat' },
+      },
+      {
+        id: 'm2',
+        zh: '山下溪魚定食', en: 'Riverfish Set',
+        desc: { zh: '當日鮮撈溪魚，以薑蔥清蒸或香煎，附白飯、湯品與小菜兩樣。', en: 'Today\'s freshly caught river fish, steamed or pan-fried with ginger and scallion.' },
+        price: 420,
+        emoji: '🐟',
+        tags: ['rec', 'gf'],
+        allergen: { zh: '魚', en: 'Fish' },
+      },
+      {
+        id: 'm3',
+        zh: '野菇燉飯', en: 'Wild Mushroom Risotto',
+        desc: { zh: '山區採集多種野菇，以昆布高湯慢煮義式燉飯，撒上台灣帕馬森起司。', en: 'Assorted foraged mushrooms slow-cooked risotto with kombu broth, topped with Taiwan Parmesan.' },
+        price: 340,
+        emoji: '🍄',
+        tags: ['veg', 'new'],
+        allergen: { zh: '乳製品', en: 'Dairy' },
+      },
+      {
+        id: 'm4',
+        zh: '五辛豆腐排', en: 'Five-Pungent Tofu Steak',
+        desc: { zh: '厚切板豆腐以蔥、蒜、韭、薤、興渠調味煎製，外酥嫩滑，佐山椒醬汁。', en: 'Thick-cut tofu pan-seared with five pungent aromatics, served with mountain pepper sauce.' },
+        price: 280,
+        emoji: '🥩',
+        tags: ['v5', 'spicy'],
+        allergen: { zh: '大豆', en: 'Soy' },
+      },
+      {
+        id: 'm5',
+        zh: '山豬肉漢堡排飯', en: 'Wild Boar Burger Steak Rice',
+        desc: { zh: '台灣原住民獵場山豬肉手工漢堡排，搭配照燒醬汁與溫泉蛋，附白飯。', en: 'Handmade wild boar patty with teriyaki sauce and onsen egg, served with steamed rice.' },
+        price: 400,
+        emoji: '🐗',
+        tags: ['hot', 'rec'],
+        allergen: { zh: '蛋、小麥、大豆', en: 'Egg, Wheat, Soy' },
+      },
+    ],
+  },
+
+  /* ─── 麵食 Noodles ─── */
+  {
+    cat: { id: 'noodles', zh: '麵食', en: 'Noodles' },
+    items: [
+      {
+        id: 'n1',
+        zh: '山上拌麵', en: 'Mountain Tossed Noodles',
+        desc: { zh: '手工粗麵以山豬骨湯滷製，拌入蔥花、辣油與花生醬，鹹香迷人。', en: 'Hand-pulled thick noodles tossed with scallion oil, chilli, and peanut sauce.' },
+        price: 200,
+        emoji: '🍜',
+        tags: ['hot'],
+        allergen: { zh: '小麥、花生、大豆', en: 'Wheat, Peanut, Soy' },
+      },
+      {
+        id: 'n2',
+        zh: '昆布清湯麵', en: 'Kombu Clear Noodle Soup',
+        desc: { zh: '以日本昆布、香菇、蘿蔔熬製清湯，搭配手工細麵，清甜回甘。', en: 'Kombu, shiitake and radish light broth with fine handmade noodles. Clear and naturally sweet.' },
+        price: 210,
+        emoji: '🥣',
+        tags: ['veg', 'new'],
+        allergen: { zh: '小麥', en: 'Wheat' },
+      },
+      {
+        id: 'n3',
+        zh: '麻辣溪魚麵', en: 'Mala River Fish Noodles',
+        desc: { zh: '溪魚以四川麻辣湯底燉煮，麻辣鮮香，附手工寬麵與豆芽。', en: 'River fish simmered in Sichuan mala broth, served with wide noodles and bean sprouts.' },
+        price: 280,
+        emoji: '🌶️',
+        tags: ['spicy', 'hot'],
+        allergen: { zh: '魚、小麥、大豆', en: 'Fish, Wheat, Soy' },
+      },
+    ],
+  },
+
+  /* ─── 湯品 Soups ─── */
+  {
+    cat: { id: 'soups', zh: '湯品', en: 'Soups' },
+    items: [
+      {
+        id: 'sp1',
+        zh: '山藥排骨湯', en: 'Yam & Pork Rib Soup',
+        desc: { zh: '南投在地山藥搭配豬肋排，慢燉四小時，湯頭濃醇清甜。', en: 'Local yam with pork ribs, slow-simmered four hours until rich and naturally sweet.' },
+        price: 180,
+        emoji: '🍲',
+        tags: ['gf'],
+        allergen: null,
+      },
+      {
+        id: 'sp2',
+        zh: '野菇昆布素湯', en: 'Wild Mushroom Kombu Soup',
+        desc: { zh: '多種山區野菇與昆布熬製，點入幾滴麻油提香，清爽療癒。', en: 'Foraged wild mushrooms and kombu broth finished with a drop of sesame oil.' },
+        price: 160,
+        emoji: '🍵',
+        tags: ['veg', 'gf'],
+        allergen: { zh: '芝麻', en: 'Sesame' },
+      },
+    ],
+  },
+
+  /* ─── 飲品 Drinks ─── */
+  {
+    cat: { id: 'drinks', zh: '飲品', en: 'Drinks' },
+    items: [
+      {
+        id: 'd1',
+        zh: '仙草凍冷泡茶', en: 'Grass Jelly Cold Brew Tea',
+        desc: { zh: '南投茶葉冷泡 12 小時，加入手工仙草凍，夏日必喝。', en: 'Nantou tea cold-brewed 12 hours, served over homemade grass jelly. Perfect for summer.' },
+        price: 120,
+        emoji: '🧋',
+        tags: ['veg', 'hot'],
+        allergen: null,
+      },
+      {
+        id: 'd2',
+        zh: '洛神花氣泡飲', en: 'Hibiscus Sparkling',
+        desc: { zh: '以新鮮洛神花熬製糖漿，加入氣泡水，酸甜清爽，色澤鮮豔。', en: 'Fresh roselle syrup topped with sparkling water. Tart, refreshing, and vibrant red.' },
+        price: 110,
+        emoji: '🌺',
+        tags: ['veg', 'new'],
+        allergen: null,
+      },
+      {
+        id: 'd3',
+        zh: '薑黃豆漿', en: 'Turmeric Soy Milk',
+        desc: { zh: '有機黃豆現磨豆漿，加入薑黃與黑胡椒，溫暖補身的黃金飲品。', en: 'Freshly ground organic soy milk with turmeric and black pepper. Golden and warming.' },
+        price: 100,
+        emoji: '🟡',
+        tags: ['veg', 'v5'],
+        allergen: { zh: '大豆', en: 'Soy' },
+      },
+      {
+        id: 'd4',
+        zh: '台灣精品黑咖啡', en: 'Taiwan Specialty Black Coffee',
+        desc: { zh: '阿里山精品咖啡豆，以手沖方式萃取，果香明亮，回甘悠長。', en: 'Alishan specialty beans hand-poured. Bright fruity acidity with a long sweet finish.' },
+        price: 150,
+        emoji: '☕',
+        tags: ['veg', 'gf', 'rec'],
+        allergen: null,
+      },
+    ],
+  },
+
+  /* ─── 甜點 Desserts ─── */
+  {
+    cat: { id: 'desserts', zh: '甜點', en: 'Desserts' },
+    items: [
+      {
+        id: 'ds1',
+        zh: '地瓜圓芋圓', en: 'Sweet Potato & Taro Balls',
+        desc: { zh: '手工製作紫芋與橙地瓜粉圓，搭配薑汁糖水或抹茶紅豆冰。', en: 'Handmade purple taro and orange sweet potato balls in ginger syrup or matcha red bean ice.' },
+        price: 130,
+        emoji: '🟣',
+        tags: ['veg', 'hot'],
+        allergen: null,
+      },
+      {
+        id: 'ds2',
+        zh: '烤地瓜鮮奶酪', en: 'Roasted Yam Panna Cotta',
+        desc: { zh: '以烤地瓜泥製作義式奶酪，佐焦糖脆片與山林莓果醬。', en: 'Silky panna cotta made with roasted yam purée, topped with caramel tuile and forest berry jam.' },
+        price: 160,
+        emoji: '🍮',
+        tags: ['veg', 'rec', 'new'],
+        allergen: { zh: '乳製品', en: 'Dairy' },
+      },
+      {
+        id: 'ds3',
+        zh: '黑糖山粉圓剉冰', en: 'Brown Sugar Basil Seed Shaved Ice',
+        desc: { zh: '台灣細綿剉冰，淋上黑糖漿，加入山粉圓、芋泥與花生，夏日清涼消暑。', en: 'Finely shaved Taiwanese ice topped with brown sugar syrup, basil seeds, taro paste, and peanuts.' },
+        price: 140,
+        emoji: '🍧',
+        tags: ['veg'],
+        allergen: { zh: '花生', en: 'Peanut' },
+      },
+    ],
+  },
+];
+
+/* ══════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════ */
+let currentLang = 'zh';
+let activeModal = null;
+
+/* ══════════════════════════════════════════════
+   LANGUAGE
+══════════════════════════════════════════════ */
+function setLang(lang) {
+  currentLang = lang;
+  document.documentElement.lang = lang === 'zh' ? 'zh-TW' : 'en';
+  document.getElementById('btn-zh').classList.toggle('active', lang === 'zh');
+  document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-zh').setAttribute('aria-pressed', lang === 'zh');
+  document.getElementById('btn-en').setAttribute('aria-pressed', lang === 'en');
+  renderAll();
+}
+
+/* ══════════════════════════════════════════════
+   TAG BADGE
+══════════════════════════════════════════════ */
+function renderTag(key) {
+  const t = TAGS[key];
+  if (!t) return '';
+  const label = currentLang === 'zh' ? t.zh : t.en;
+  return `<span class="tag-badge ${t.cls}" role="img" aria-label="${label}">${label}</span>`;
+}
+
+/* ══════════════════════════════════════════════
+   PRICE
+══════════════════════════════════════════════ */
+function fmtPrice(p) { return `NT$ ${p}`; }
+
+/* ══════════════════════════════════════════════
+   RENDER CATEGORY NAV
+══════════════════════════════════════════════ */
+function renderCatNav() {
+  const nav = document.getElementById('cat-nav');
+  nav.innerHTML = MENU.map(sec => {
+    const label = currentLang === 'zh' ? sec.cat.zh : sec.cat.en;
+    return `<button class="cat-btn" role="tab" data-cat="${sec.cat.id}" onclick="scrollToSection('${sec.cat.id}')" aria-label="${label}">${label}</button>`;
+  }).join('');
+  updateActiveCat();
+}
+
+/* ══════════════════════════════════════════════
+   RENDER MENU SECTIONS
+══════════════════════════════════════════════ */
+function renderSections() {
+  const main = document.getElementById('main-content');
+  main.innerHTML = MENU.map(sec => {
+    const titleZh = sec.cat.zh;
+    const titleEn = sec.cat.en;
+    const cards = sec.items.map(item => renderCard(item)).join('');
+    return `
+      <section class="menu-section" id="sec-${sec.cat.id}" data-section="${sec.cat.id}">
+        <div class="section-header">
+          <span class="section-title-zh">${titleZh}</span>
+          <span class="section-title-en">${titleEn}</span>
+        </div>
+        <div class="section-divider"></div>
+        <div class="card-grid">${cards}</div>
+      </section>`;
+  }).join('');
+
+  // Observe sections for active nav highlight
+  observeSections();
+}
+
+/* ══════════════════════════════════════════════
+   RENDER CARD
+══════════════════════════════════════════════ */
+function renderCard(item) {
+  const name = currentLang === 'zh' ? item.zh : item.en;
+  const nameAlt = currentLang === 'zh' ? item.en : item.zh;
+  const desc = item.desc[currentLang];
+  const tagsHtml = (item.tags || []).map(renderTag).join('');
+  const media = item.img
+    ? `<img src="${item.img}" alt="${name}" loading="lazy" />`
+    : `<span aria-hidden="true">${item.emoji}</span>`;
+
+  return `
+    <article class="menu-card" role="button" tabindex="0"
+      onclick="openModal('${item.id}')"
+      onkeydown="if(event.key==='Enter'||event.key===' ')openModal('${item.id}')"
+      aria-label="${name} ${fmtPrice(item.price)}">
+      <div class="card-img-wrap">${media}</div>
+      <div class="card-body">
+        <div class="card-name-zh">${name}</div>
+        <div class="card-name-en">${nameAlt}</div>
+        <div class="card-desc">${desc}</div>
+        <div class="card-footer">
+          <div class="card-tags">${tagsHtml}</div>
+          <div class="card-price">${fmtPrice(item.price)}</div>
+        </div>
+      </div>
+    </article>`;
+}
+
+/* ══════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════ */
+function findItem(id) {
+  for (const sec of MENU) {
+    const found = sec.items.find(i => i.id === id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function openModal(id) {
+  const item = findItem(id);
+  if (!item) return;
+  activeModal = id;
+
+  const nameZh = item.zh;
+  const nameEn = item.en;
+  const name = currentLang === 'zh' ? nameZh : nameEn;
+  const nameAlt = currentLang === 'zh' ? nameEn : nameZh;
+  const desc = item.desc[currentLang];
+  const tagsHtml = (item.tags || []).map(renderTag).join('');
+
+  // Image / Emoji
+  const imgWrap = document.getElementById('modal-img-wrap');
+  const closeBtn = document.getElementById('modal-close-btn');
+  imgWrap.innerHTML = '';
+  imgWrap.appendChild(closeBtn);
+  if (item.img) {
+    const img = document.createElement('img');
+    img.src = item.img;
+    img.alt = name;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.setAttribute('touch-action', 'pinch-zoom');
+    imgWrap.prepend(img);
+  } else {
+    const em = document.createElement('span');
+    em.setAttribute('aria-hidden', 'true');
+    em.style.fontSize = '80px';
+    em.textContent = item.emoji;
+    imgWrap.prepend(em);
+  }
+
+  document.getElementById('modal-name').textContent = name;
+  document.getElementById('modal-name-en').textContent = nameAlt;
+  document.getElementById('modal-tags').innerHTML = tagsHtml;
+  document.getElementById('modal-price').textContent = fmtPrice(item.price);
+  document.getElementById('modal-desc').textContent = desc;
+
+  const allergenTitle = document.getElementById('modal-allergen-title');
+  const allergenEl = document.getElementById('modal-allergen');
+  if (item.allergen) {
+    allergenTitle.style.display = '';
+    allergenEl.textContent = currentLang === 'zh'
+      ? `含：${item.allergen.zh}`
+      : `Contains: ${item.allergen.en}`;
+  } else {
+    allergenTitle.style.display = 'none';
+    allergenEl.textContent = '';
+  }
+
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.classList.add('modal-open');
+  document.getElementById('modal-close-btn').focus();
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.classList.remove('modal-open');
+  activeModal = null;
+}
+
+// Close on overlay click
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+});
+document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && activeModal) closeModal();
+});
+
+/* ══════════════════════════════════════════════
+   SCROLL & ACTIVE NAV
+══════════════════════════════════════════════ */
+function scrollToSection(catId) {
+  const el = document.getElementById('sec-' + catId);
+  if (!el) return;
+  const headerH = document.querySelector('.header').offsetHeight;
+  const navH = document.querySelector('.cat-nav-wrap').offsetHeight;
+  const top = el.getBoundingClientRect().top + window.scrollY - headerH - navH - 4;
+  window.scrollTo({ top, behavior: 'smooth' });
+}
+
+let sectionObserver;
+function observeSections() {
+  if (sectionObserver) sectionObserver.disconnect();
+  const headerH = document.querySelector('.header').offsetHeight;
+  const navH = document.querySelector('.cat-nav-wrap').offsetHeight;
+  const rootMarginTop = -(headerH + navH + 2);
+
+  sectionObserver = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.dataset.section;
+        setActiveNav(id);
+      }
+    });
+  }, {
+    rootMargin: `${rootMarginTop}px 0px -60% 0px`,
+    threshold: 0,
+  });
+
+  document.querySelectorAll('[data-section]').forEach(el => sectionObserver.observe(el));
+}
+
+function setActiveNav(catId) {
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    const active = btn.dataset.cat === catId;
+    btn.classList.toggle('active', active);
+    btn.setAttribute('aria-selected', active);
+  });
+  // Scroll active button into view in nav
+  const activeBtn = document.querySelector(`.cat-btn[data-cat="${catId}"]`);
+  if (activeBtn) {
+    activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+}
+
+function updateActiveCat() {
+  const first = MENU[0];
+  if (first) setActiveNav(first.cat.id);
+}
+
+/* ══════════════════════════════════════════════
+   FOOTER I18N
+══════════════════════════════════════════════ */
+function renderFooter() {
+  const info = SITE_INFO[currentLang];
+  document.getElementById('footer-brand').textContent = info.brand + ' Up & Down';
+  document.getElementById('footer-addr').textContent = info.addr;
+  document.getElementById('footer-hours').textContent = info.hours;
+  document.getElementById('footer-note').textContent = info.note;
+}
+
+/* ══════════════════════════════════════════════
+   RENDER ALL
+══════════════════════════════════════════════ */
+function renderAll() {
+  renderCatNav();
+  renderSections();
+  renderFooter();
+  if (activeModal) openModal(activeModal);
+}
+
+/* ══════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  renderAll();
+});
+</script>
+</body>
+</html>
