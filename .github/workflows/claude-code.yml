@@ -13,7 +13,7 @@ jobs:
     if: |
       github.event_name == 'pull_request' ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude'))
-    
+
     runs-on: ubuntu-latest
 
     # 這裡直接宣告權限，確保它對儲存庫內容和 PR 有讀寫權限
@@ -21,6 +21,7 @@ jobs:
       contents: write
       pull-requests: write
       issues: write
+      id-token: write   # Claude Code Action 需要此權限來取得 OIDC Token
 
     steps:
       # 1. 複製（Checkout）你的專案程式碼到執行環境
